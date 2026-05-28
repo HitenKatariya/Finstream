@@ -92,6 +92,8 @@ class SentimentModelManager:
 
     @property
     def is_ready(self) -> bool:
+        if self.backend != "transformers":
+            return self._load_error is None
         return self._pipeline is not None and self._load_error is None
 
     @property
