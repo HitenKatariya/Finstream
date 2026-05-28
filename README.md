@@ -102,6 +102,18 @@ This view shows the main sentiment form, the live FastAPI-connected prediction r
 
 This view is used for CSV upload testing, batch sentiment processing, report ID generation, and PDF report download. It demonstrates the batch workflow for message-wise sentiment analysis and sentiment net summary reporting.
 
+### Model Evaluation Snapshot
+
+![FinStream classification report screenshot](docs/screenshots/model_classification_metrics.png)
+
+This snapshot captures a notebook test-set result with 83.36% accuracy and a full classification report for bullish, neutral, and bearish labels.
+
+### Training History Snapshot
+
+![FinStream training history graph](docs/screenshots/model_convergence_graph.png)
+
+This plot shows training loss trending downward, validation loss stabilizing, and validation F1 / precision / recall converging across epochs.
+
 ## GIF Demo
 
 Add a short walkthrough GIF and embed it below:
@@ -219,46 +231,6 @@ Recommended workflow:
 - Run backend and frontend in separate integrated terminals.
 - Use notebook mode for evaluation experiments.
 
-## Render Deployment Guide
-
-Deploy with the root [render.yaml](render.yaml) blueprint for a one-click multi-service setup.
-
-### Blueprint deployment
-
-1. Connect your Git repository in Render.
-2. Choose "Blueprint" deployment and point Render to `render.yaml` at the repo root.
-3. Render creates both the backend and frontend web services.
-4. Add your secret `HF_TOKEN` when prompted during blueprint creation.
-
-### Services created by the blueprint
-
-### 1. Backend service (FastAPI)
-- Root directory: `backend`
-- Build command: `pip install -r requirements.txt`
-- Start command: `uvicorn backend.main:app --host 0.0.0.0 --port $PORT`
-- Health check: `/health`
-
-### 2. Frontend service (Flask)
-- Root directory: `frontend`
-- Build command: `pip install -r requirements.txt`
-- Start command: `gunicorn app:app --bind 0.0.0.0:$PORT`
-- Health check: `/health`
-- The blueprint injects `FASTAPI_BASE_URL` from the backend service host.
-
-Optional backend environment variables:
-- `HF_TOKEN`
-- `MODEL_NAME`
-- `LOG_LEVEL`
-- `CORS_ORIGINS`
-
-Local environment setup is described in [.env.example](.env.example).
-
-## API Documentation
-
-FastAPI auto-generates docs:
-- Swagger UI: `http://localhost:8000/docs`
-- ReDoc: `http://localhost:8000/redoc`
-
 ### Endpoints
 
 #### `GET /health`
@@ -314,6 +286,8 @@ Latest run (`evaluation/evaluate_model.py`) on 24 custom financial samples:
 | Recall (weighted) | 0.4583 |
 | F1-score (weighted) | 0.4386 |
 
+The notebook-based training screenshot above shows a separate test-set summary with 83.36% accuracy and the corresponding class-wise report.
+
 Generated artifacts:
 - `evaluation/results/metrics.json`
 - `evaluation/results/classification_report.txt`
@@ -332,17 +306,4 @@ Generated artifacts:
 - Add CI/CD workflows and automated regression tests.
 - Add role-based dashboard views and historical trend tracking.
 - Optimize latency with quantization or model distillation.
-
-## Contributors
-
-- Hiten (Project Owner)
-- Open to contributors via pull requests
-
-## License
-
-No license file is currently included. Add your preferred license (for example, MIT) in a `LICENSE` file before public distribution.
-
----
-
-### Built with ❤️ for modern AI + finance portfolios
 
