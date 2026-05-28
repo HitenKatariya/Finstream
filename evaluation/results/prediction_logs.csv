@@ -1,0 +1,25 @@
+text,true_label,predicted_label,confidence,is_correct
+Shares of the cloud software company rallied after quarterly revenue beat expectations and the guidance was raised.,bullish,neutral,0.9841954708099365,False
+"The bank reported stronger net interest income and a surprise jump in deposits, pushing the stock higher in after-hours trading.",bullish,neutral,0.9800784587860107,False
+Investors bought the dip after the retailer announced an aggressive buyback and better-than-feared holiday sales.,bullish,neutral,0.9081704616546631,False
+"The semiconductor maker posted record margins, and analysts upgraded the outlook following the earnings call.",bullish,neutral,0.9896132349967957,False
+The energy producer benefited from higher crude prices and said free cash flow will remain strong this quarter.,bullish,neutral,0.9869720339775085,False
+"The fintech platform added new customers at a faster pace, while transaction volume climbed sharply year over year.",bullish,neutral,0.9918832778930664,False
+"The airline cut fuel cost guidance and reported a smaller-than-expected loss, helping shares recover.",bullish,neutral,0.9459430575370789,False
+"The EV manufacturer secured a major battery supply agreement, easing concerns about production capacity.",bullish,neutral,0.988365650177002,False
+Markets sold off as inflation accelerated and traders priced in more aggressive rate hikes from the central bank.,bearish,bearish,0.9371591210365295,True
+The regional lender fell sharply after warning about rising loan losses and weaker credit quality.,bearish,bearish,0.9865224957466125,True
+"The consumer brand missed estimates, cut full-year guidance, and warned that margins will remain under pressure.",bearish,bearish,0.9907841682434082,True
+Shares tumbled after the cybersecurity company disclosed a breach that could trigger costly remediation spending.,bearish,bearish,0.9860949516296387,True
+The shipping firm reported lower freight rates and warned that demand could soften through the rest of the year.,bearish,bearish,0.9728503227233887,True
+The retailer's turnaround stalled as same-store sales declined and inventory discounts weighed on profitability.,bearish,bearish,0.9874732494354248,True
+"The biotech stock dropped after regulators requested additional trial data, delaying a key approval decision.",bearish,bearish,0.9747231602668762,True
+The industrial company announced layoffs and restructuring charges after demand slowed across core markets.,bearish,bearish,0.9882232546806335,True
+The central bank left rates unchanged and repeated that future moves will depend on incoming data.,neutral,bullish,0.8917442560195923,False
+The company said it completed a routine board review and maintained its prior full-year guidance without changes.,neutral,bullish,0.9598710536956787,False
+Analysts kept a hold rating on the stock after the quarterly update came in broadly in line with expectations.,neutral,neutral,0.8399783968925476,True
+The asset manager described trading conditions as stable while noting that asset inflows were mixed across product lines.,neutral,neutral,0.6666315197944641,True
+The conglomerate said it was monitoring macro conditions and would revisit capital allocation later this year.,neutral,bullish,0.9575872421264648,False
+The market digest noted unchanged analyst targets and no material updates after the investor conference.,neutral,bullish,0.9891735315322876,False
+"The telecom operator reported steady subscriber growth, but management said the results were in line with prior quarters.",neutral,neutral,0.9727809429168701,True
+The company confirmed a planned leadership transition and said operations should continue without interruption.,neutral,bullish,0.9609948992729187,False

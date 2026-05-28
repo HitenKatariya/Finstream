@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ app_name }} | Financial Sentiment Intelligence</title>
+  <meta name="description" content="FinStream analyzes financial news sentiment with a production-ready AI-powered interface.">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script>
+    window.FINSTREAM_CONFIG = {
+      apiBaseUrl: "{{ api_base_url }}"
+    };
+  </script>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark sticky-top glass-nav">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="#">
+        <span class="brand-mark"><i class="fa-solid fa-chart-line"></i></span>
+        {{ app_name }}
+      </a>
+      <div class="ms-auto d-flex align-items-center gap-3">
+        <span class="badge text-bg-info-subtle nav-badge">FastAPI Connected</span>
+        <button id="themeToggle" class="btn btn-sm btn-outline-light theme-toggle" type="button" aria-label="Toggle theme">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="hero-shell">
+    <section class="hero-section">
+      <div class="container py-5">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-6">
+            <div class="eyebrow mb-3">AIML Sentiment Intelligence</div>
+            <h1 class="display-4 fw-black mb-3">Turn financial headlines into trading sentiment.</h1>
+            <p class="lead text-secondary-emphasis mb-4">
+              FinStream pairs a Flask dashboard with a FastAPI model service to analyze news in real time with polished analytics, clear outcomes, and fast deployment.
+            </p>
+            <div class="d-flex flex-wrap gap-2 mb-4">
+              <span class="feature-pill">Live API fetch</span>
+              <span class="feature-pill">Dark mode UI</span>
+              <span class="feature-pill">Confidence analytics</span>
+              <span class="feature-pill">Render ready</span>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Inference</div>
+                <div class="stat-value">Hugging Face</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Transport</div>
+                <div class="stat-value">fetch()</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Deployment</div>
+                <div class="stat-value">Render</div>
+              </div>
+              <div class="stat-card accent">
+                <div class="stat-label">Backend</div>
+                <div class="stat-value">FastAPI</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container pb-5">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="panel-card h-100">
+            <div class="panel-header">
+              <div>
+                <h2 class="h4 mb-1">Analyze financial news</h2>
+                <p class="text-secondary mb-0">Paste a headline, earnings note, or market update.</p>
+              </div>
+              <span class="badge rounded-pill text-bg-dark">Model: hitenvk22/FinStream-Sentiment</span>
+            </div>
+
+            <form id="predictForm" class="mt-4">
+              <label for="newsInput" class="form-label text-uppercase small text-secondary fw-semibold">Financial news text</label>
+              <textarea id="newsInput" class="form-control news-input" rows="6" placeholder="Example: Tech stocks rally after the central bank signals a pause in rate hikes..."></textarea>
+
+              <div class="quick-samples mt-3">
+                <button type="button" class="sample-chip" data-sample="Company shares surge after quarterly revenue beats expectations and guidance is raised.">Bullish earnings beat</button>
+                <button type="button" class="sample-chip" data-sample="Markets tumble as inflation accelerates and investors price in more aggressive rate hikes.">Bearish macro shock</button>
+                <button type="button" class="sample-chip" data-sample="Analysts remain cautious while the company reports mixed results and unchanged guidance.">Neutral mixed outlook</button>
+              </div>
+
+              <div class="d-flex align-items-center justify-content-between gap-3 mt-4 flex-wrap">
+                <div class="form-text text-secondary">Tip: use one or two sentences for best results.</div>
+                <button id="predictButton" class="btn btn-primary btn-lg px-4 predict-btn" type="submit">
+                  <span class="btn-label">Predict</span>
+                  <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner" role="status" aria-hidden="true"></span>
+                </button>
+              </div>
+            </form>
+
+            <hr class="my-4">
+
+            <div class="batch-upload">
+              <h5 class="mb-2">Batch CSV Analysis</h5>
+              <p class="text-secondary small">Upload a CSV with a column containing messages; FinStream will auto-detect the text column.</p>
+              <div class="mb-3">
+                <input id="csvFile" class="d-none" type="file" accept=".csv" />
+                <div class="d-flex flex-wrap gap-2 align-items-center">
+                  <button id="browseCsvButton" class="btn btn-outline-light" type="button">
+                    <i class="fa-solid fa-folder-open me-2"></i>Choose CSV File
+                  </button>
+                  <span id="selectedCsvLabel" class="text-secondary small">No file selected</span>
+                </div>
+              </div>
+              <div class="mb-3 d-flex gap-2">
+                <input id="reportId" class="form-control" type="text" placeholder="Optional report ID (alphanumeric)" />
+                <button id="uploadCsvButton" class="btn btn-primary" type="button">
+                  <i class="fa-solid fa-file-arrow-up me-2"></i>Upload & Analyze
+                </button>
+              </div>
+              <div id="batchError" class="alert alert-danger d-none" role="alert"></div>
+              <div id="batchSummary" class="mt-3 d-none"></div>
+              <div id="batchTableSection" class="mt-4 d-none">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
+                  <h6 class="mb-0 text-uppercase text-secondary fw-bold">Detailed sentiment results</h6>
+                  <span id="batchResultCount" class="badge rounded-pill text-bg-dark"></span>
+                </div>
+                <div class="table-responsive batch-table-wrap">
+                  <table class="table table-dark table-striped align-middle mb-0 batch-results-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Message</th>
+                        <th>Sentiment</th>
+                        <th>Confidence</th>
+                      </tr>
+                    </thead>
+                    <tbody id="batchResultsTableBody"></tbody>
+                  </table>
+                </div>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-3">
+                  <div id="batchTableMeta" class="text-secondary small"></div>
+                  <nav aria-label="Batch results pagination">
+                    <ul id="batchPagination" class="pagination pagination-sm mb-0"></ul>
+                  </nav>
+                </div>
+              </div>
+              <div class="mt-3">
+                <a id="downloadReportLink" class="btn btn-sm btn-primary d-none" href="#" target="_blank">Download PDF Report</a>
+              </div>
+            </div>
+
+            <div id="errorBox" class="alert alert-danger mt-4 d-none" role="alert"></div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="panel-card h-100">
+            <h2 class="h4 mb-3">Prediction result</h2>
+            <div id="emptyState" class="empty-state">
+              <i class="fa-solid fa-wand-magic-sparkles"></i>
+              <p class="mb-0">Run an analysis to see the sentiment label, confidence score, and analytics.</p>
+            </div>
+
+            <div id="resultArea" class="result-stack d-none">
+              <div id="sentimentCard" class="sentiment-card bullish">
+                <div class="sentiment-copy">
+                  <span class="sentiment-kicker">Sentiment</span>
+                  <h3 id="sentimentLabel" class="sentiment-label mb-0">Bullish</h3>
+                </div>
+                <div class="confidence-block">
+                  <span class="sentiment-kicker">Confidence</span>
+                  <div id="confidenceScore" class="confidence-score">98%</div>
+                </div>
+              </div>
+
+              <div class="chart-card">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                  <h3 class="h6 mb-0 text-uppercase text-secondary fw-bold">Sentiment analytics</h3>
+                  <span class="text-secondary small">Realtime response</span>
+                </div>
+                <div class="chart-wrap">
+                  <canvas id="sentimentChart" height="190"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="container pb-5">
+      <div class="panel-card">
+        <div class="row g-4 align-items-center">
+          <div class="col-md-8">
+            <h2 class="h4 mb-2">Example financial news samples</h2>
+            <p class="text-secondary mb-0">Use the chips above or try your own headline. The interface is built for analysts, demos, and portfolio reviews.</p>
+          </div>
+          <div class="col-md-4 text-md-end">
+            <div class="mini-metrics">
+              <div><strong>API:</strong> FastAPI</div>
+              <div><strong>UI:</strong> Flask + Bootstrap</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer-bar">
+    <div class="container d-flex flex-wrap justify-content-between align-items-center gap-3 py-3">
+      <div>© 2026 FinStream. Financial sentiment intelligence for modern AIML workflows.</div>
+      <div class="text-secondary">Built for Render deployment with a Flask frontend and FastAPI model service.</div>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

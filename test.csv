@@ -1,0 +1,26 @@
+report_id,message,sector,source,priority
+1,"Tech stocks rally after the central bank signals a pause in rate hikes.",Markets,Reuters,high
+2,"Shares rise as the company reports stronger than expected quarterly revenue.",Technology,Bloomberg,high
+3,"The lender warned about rising loan losses and weaker credit quality.",Banking,Reuters,high
+4,"Analysts remained neutral after the earnings release matched expectations.",Finance,MarketWatch,medium
+5,"Oil prices climb as supply concerns and geopolitical tensions intensify.",Energy,CNBC,medium
+6,"The retailer cut guidance and said margin pressure will continue this quarter.",Retail,Bloomberg,high
+7,"Investors cheered the buyback announcement and improved cash flow outlook.",Technology,Reuters,medium
+8,"The biotech firm delayed its approval timeline after regulators requested more data.",Healthcare,Reuters,high
+9,"Management said demand stayed steady and kept the full-year forecast unchanged.",Industrials,MarketWatch,low
+10,"The auto maker raised production targets following strong preorders for the new model.",Automotive,CNBC,high
+11,"The software company missed profit estimates and shares fell in after-hours trading.",Technology,Bloomberg,high
+12,"The market traded flat as investors waited for the inflation report.",Markets,Reuters,low
+13,"The airline benefited from lower fuel costs and higher passenger bookings.",Travel,Reuters,medium
+14,"The utility announced routine maintenance and confirmed no major changes to guidance.",Utilities,MarketWatch,low
+15,"The semiconductor supplier secured a major contract and lifted revenue forecasts.",Technology,CNBC,high
+16,"The bank issued a cautious outlook due to macro uncertainty and slower loan growth.",Banking,Reuters,medium
+17,"The company said results were broadly in line with estimates and guidance held steady.",Finance,Bloomberg,low
+18,"Gold prices fell as risk appetite improved and the dollar strengthened.",Commodities,CNBC,medium
+19,"The consumer brand reported record demand and expanded its margin outlook.",Consumer,Reuters,high
+20,"The shipping firm warned that freight volumes remain weak amid softer global trade.",Logistics,MarketWatch,high
+21,"The exchange operator benefited from higher trading activity and stronger fee income.",Financials,Bloomberg,medium
+22,"The mortgage lender said rising rates continue to weigh on new originations.",Banking,Reuters,high
+23,"The food producer maintained its annual plan after a stable first-half performance.",Consumer,CNBC,low
+24,"The mobile carrier added subscribers but said competitive pricing pressure remains.",Telecom,Reuters,medium
+25,"The investment bank posted solid advisory revenue and upbeat capital markets activity.",Financials,MarketWatch,high

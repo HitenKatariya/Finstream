@@ -1,0 +1,9 @@
+{
+  "model_name": "hitenvk22/FinStream-Sentiment",
+  "device": "cpu",
+  "sample_count": 24,
+  "accuracy": 0.4583333333333333,
+  "precision": 0.42424242424242425,
+  "recall": 0.4583333333333333,
+  "f1_score": 0.4385964912280702
+}

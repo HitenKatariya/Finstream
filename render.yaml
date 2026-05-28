@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: finstream-backend
+    runtime: python
+    rootDir: backend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: MODEL_NAME
+        value: hitenvk22/FinStream-Sentiment
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CORS_ORIGINS
+        value: '["*"]'
+      - key: HF_TOKEN
+        sync: false
+
+  - type: web
+    name: finstream-frontend
+    runtime: python
+    rootDir: frontend
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: FinStream
+      - key: FASTAPI_BASE_URL
+        fromService:
+          name: finstream-backend
+          type: web
+          property: host
