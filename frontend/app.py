@@ -15,7 +15,7 @@ def _normalize_api_base_url(raw_value: str | None) -> str:
     if not value:
         return "http://localhost:8000"
     if "://" not in value:
-        return f"https://{value}"
+        return f"http://{value}"
     return value
 
 

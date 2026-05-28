@@ -203,13 +203,13 @@ In another terminal:
 ```bash
 cd frontend
 # Windows PowerShell
-$env:FASTAPI_BASE_URL="http://localhost:8000"
+$env:BACKEND_API_URL="http://localhost:8000"
 python app.py
 ```
 
 ```bash
 # macOS/Linux
-FASTAPI_BASE_URL=http://localhost:8000 python app.py
+BACKEND_API_URL=http://localhost:8000 python app.py
 ```
 
 Open `http://localhost:5000`.
@@ -258,5 +258,38 @@ const response = await fetch("http://localhost:8000/predict", {
 const data = await response.json();
 console.log(data);
 ```
+
+## Render Deployment Guide
+
+Deploy the project with the root [render.yaml](render.yaml) blueprint.
+The backend and frontend are both containerized with Dockerfiles, and the Flask frontend proxies `/api/*` calls to the backend service over Render's internal network.
+
+### What Render creates
+
+- Backend Docker service from [backend/Dockerfile](backend/Dockerfile)
+- Frontend Docker service from [frontend/Dockerfile](frontend/Dockerfile)
+- Internal backend connection injected into the frontend through `BACKEND_API_URL`
+
+### Setup steps
+
+1. Push the repository to GitHub.
+2. In Render, create a new Blueprint deployment.
+3. Select the repo root and let Render read [render.yaml](render.yaml).
+4. Enter the secret `HF_TOKEN` when prompted.
+5. Deploy both services together.
+
+### Environment variables
+
+- `MODEL_NAME` = `hitenvk22/FinStream-Sentiment`
+- `LOG_LEVEL` = `INFO`
+- `CORS_ORIGINS` = `["*"]`
+- `HF_TOKEN` = secret Hugging Face token
+- `BACKEND_API_URL` = injected from the backend service for the frontend proxy
+
+### Notes
+
+- The frontend browser only talks to the Flask service.
+- The Flask service forwards requests to the FastAPI backend.
+- You can later replace the backend service URL by updating `BACKEND_API_URL`.
 
 

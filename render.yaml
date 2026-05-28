@@ -3,7 +3,7 @@ services:
     name: finstream-backend
     runtime: docker
     dockerfilePath: backend/Dockerfile
-    dockerContext: .
+    dockerContext: backend
     plan: starter
     healthCheckPath: /health
     envVars:
@@ -20,7 +20,7 @@ services:
     name: finstream-frontend
     runtime: docker
     dockerfilePath: frontend/Dockerfile
-    dockerContext: .
+    dockerContext: frontend
     plan: starter
     healthCheckPath: /health
     envVars:
@@ -30,4 +30,4 @@ services:
         fromService:
           name: finstream-backend
           type: web
-          property: host
+          property: hostport
