@@ -9,9 +9,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.requests import Request
 
-from .app.api.routes import router as api_router
-from .app.core.config import get_settings
-from .app.services.model_service import SentimentModelManager
+from app.api.routes import router as api_router
+from app.core.config import get_settings
+from app.services.model_service import SentimentModelManager
 
 
 settings = get_settings()
