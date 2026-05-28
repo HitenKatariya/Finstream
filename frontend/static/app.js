@@ -195,6 +195,21 @@ function renderResult(payload) {
   updateChart(label, confidence);
 }
 
+async function readApiResponse(response) {
+  const contentType = response.headers.get("content-type") || "";
+  const rawText = await response.text();
+
+  if (contentType.includes("application/json")) {
+    try {
+      return rawText ? JSON.parse(rawText) : {};
+    } catch (error) {
+      return { detail: rawText || "Invalid JSON response from server." };
+    }
+  }
+
+  return { detail: rawText || "Unexpected non-JSON response from server." };
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
   hideError();
@@ -214,8 +229,7 @@ async function handleSubmit(event) {
       body: JSON.stringify({ text }),
     });
 
-    const contentType = response.headers.get("content-type") || "";
-    const data = contentType.includes("application/json") ? await response.json() : { detail: await response.text() };
+    const data = await readApiResponse(response);
 
     if (!response.ok) {
       throw new Error(data.detail || "Unable to analyze the provided text.");
@@ -276,7 +290,7 @@ async function handleCsvUpload() {
       body: form,
     });
 
-    const data = await resp.json();
+    const data = await readApiResponse(resp);
     if (!resp.ok) throw new Error(data.detail || "CSV analysis failed");
 
     const s = data.summary;
