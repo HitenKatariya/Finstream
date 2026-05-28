@@ -20,6 +20,19 @@ FinStream is a full-stack AIML project for real-time financial news sentiment an
 ### Current model
 - Hugging Face model: [hitenvk22/FinStream-Sentiment](https://huggingface.co/hitenvk22/finstream-sentiment)
 
+### Model Evaluation Snapshot
+
+![FinStream classification report screenshot](docs/screenshots/model_classification_metrics.png)
+
+This snapshot captures a notebook test-set result with 83.36% accuracy and a full classification report for bullish, neutral, and bearish labels.
+
+### Training History Snapshot
+
+![FinStream training history graph](docs/screenshots/model_convergence_graph.png)
+
+This plot shows training loss trending downward, validation loss stabilizing, and validation F1 / precision / recall converging across epochs.
+
+
 ## Architecture Diagram
 
 ```mermaid
@@ -102,25 +115,7 @@ This view shows the main sentiment form, the live FastAPI-connected prediction r
 
 This view is used for CSV upload testing, batch sentiment processing, report ID generation, and PDF report download. It demonstrates the batch workflow for message-wise sentiment analysis and sentiment net summary reporting.
 
-### Model Evaluation Snapshot
 
-![FinStream classification report screenshot](docs/screenshots/model_classification_metrics.png)
-
-This snapshot captures a notebook test-set result with 83.36% accuracy and a full classification report for bullish, neutral, and bearish labels.
-
-### Training History Snapshot
-
-![FinStream training history graph](docs/screenshots/model_convergence_graph.png)
-
-This plot shows training loss trending downward, validation loss stabilizing, and validation F1 / precision / recall converging across epochs.
-
-## GIF Demo
-
-Add a short walkthrough GIF and embed it below:
-
-```md
-![FinStream Demo](screenshots/demo.gif)
-```
 
 ## Model Training Details
 
@@ -219,18 +214,6 @@ FASTAPI_BASE_URL=http://localhost:8000 python app.py
 
 Open `http://localhost:5000`.
 
-## VS Code Setup
-
-Recommended extensions:
-- Python
-- Pylance
-- Jupyter
-- Black Formatter (optional)
-
-Recommended workflow:
-- Select `.venv` interpreter.
-- Run backend and frontend in separate integrated terminals.
-- Use notebook mode for evaluation experiments.
 
 ### Endpoints
 
@@ -276,35 +259,4 @@ const data = await response.json();
 console.log(data);
 ```
 
-## Model Evaluation Metrics
-
-Latest run (`evaluation/evaluate_model.py`) on 24 custom financial samples:
-
-| Metric | Value |
-|---|---:|
-| Accuracy | 0.4583 |
-| Precision (weighted) | 0.4242 |
-| Recall (weighted) | 0.4583 |
-| F1-score (weighted) | 0.4386 |
-
-The notebook-based training screenshot above shows a separate test-set summary with 83.36% accuracy and the corresponding class-wise report.
-
-Generated artifacts:
-- `evaluation/results/metrics.json`
-- `evaluation/results/classification_report.txt`
-- `evaluation/results/classification_report.csv`
-- `evaluation/results/prediction_logs.csv`
-- `evaluation/plots/confusion_matrix_heatmap.png`
-- `evaluation/plots/prediction_distribution.png`
-- `evaluation/plots/confidence_histogram.png`
-- `evaluation/plots/sentiment_pie_chart.png`
-
-## Future Improvements
-
-- Expand and rebalance labeled financial datasets.
-- Add confidence calibration and thresholding.
-- Integrate active-learning annotation UI.
-- Add CI/CD workflows and automated regression tests.
-- Add role-based dashboard views and historical trend tracking.
-- Optimize latency with quantization or model distillation.
 

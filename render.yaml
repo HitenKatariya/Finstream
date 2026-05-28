@@ -1,11 +1,10 @@
 services:
   - type: web
     name: finstream-backend
-    runtime: python
-    rootDir: backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
     plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     envVars:
       - key: MODEL_NAME
@@ -19,16 +18,15 @@ services:
 
   - type: web
     name: finstream-frontend
-    runtime: python
-    rootDir: frontend
+    runtime: docker
+    dockerfilePath: frontend/Dockerfile
+    dockerContext: .
     plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
     healthCheckPath: /health
     envVars:
       - key: APP_NAME
         value: FinStream
-      - key: FASTAPI_BASE_URL
+      - key: BACKEND_API_URL
         fromService:
           name: finstream-backend
           type: web
