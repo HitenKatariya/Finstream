@@ -9,6 +9,8 @@ services:
     envVars:
       - key: MODEL_NAME
         value: hitenvk22/FinStream-Sentiment
+      - key: MODEL_BACKEND
+        value: rule_based
       - key: LOG_LEVEL
         value: INFO
       - key: CORS_ORIGINS

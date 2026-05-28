@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     model_name: str = Field(default="hitenvk22/FinStream-Sentiment")
     hf_token: str | None = Field(default=None)
     log_level: str = Field(default="INFO")
+    model_backend: str = Field(default="rule_based")
     cors_origins: List[str] = Field(default_factory=lambda: ["*"])
 
     @field_validator("cors_origins", mode="before")

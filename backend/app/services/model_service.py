@@ -3,14 +3,58 @@
 from __future__ import annotations
 
 import logging
+import re
 from threading import Lock
 
 from anyio import to_thread
-import torch
-from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 
 
 logger = logging.getLogger("finstream.model")
+
+POSITIVE_WORDS = {
+    "beat",
+    "beats",
+    "beats",
+    "bullish",
+    "gain",
+    "gains",
+    "growth",
+    "higher",
+    "improve",
+    "improved",
+    "outperform",
+    "profit",
+    "profits",
+    "rally",
+    "rallies",
+    "rose",
+    "surge",
+    "surges",
+    "strong",
+    "up",
+}
+
+NEGATIVE_WORDS = {
+    "bearish",
+    "decline",
+    "declines",
+    "drop",
+    "drops",
+    "fall",
+    "falls",
+    "loss",
+    "losses",
+    "miss",
+    "misses",
+    "pressure",
+    "risk",
+    "selloff",
+    "slump",
+    "soft",
+    "weak",
+    "weaker",
+    "down",
+}
 
 
 def _normalize_label(raw_label: str) -> str:
@@ -36,11 +80,12 @@ def _normalize_label(raw_label: str) -> str:
 class SentimentModelManager:
     """Owns model lifecycle and performs thread-safe inference."""
 
-    def __init__(self, model_name: str, hf_token: str | None = None) -> None:
+    def __init__(self, model_name: str, hf_token: str | None = None, backend: str = "rule_based") -> None:
         self.model_name = model_name
         self.hf_token = hf_token
-        self.device = "cuda" if torch.cuda.is_available() else "cpu"
-        self._device_index = 0 if torch.cuda.is_available() else -1
+        self.backend = backend.lower().strip()
+        self.device = "cpu"
+        self._device_index = -1
         self._pipeline = None
         self._lock = Lock()
         self._load_error: str | None = None
@@ -54,12 +99,17 @@ class SentimentModelManager:
         return self._load_error
 
     async def load_async(self) -> None:
-        """Load the Hugging Face pipeline during application startup."""
+        """Load the inference backend during application startup when needed."""
 
         await to_thread.run_sync(self.load)
 
     def load(self) -> None:
-        """Load the model and tokenizer once, even under concurrent startup."""
+        """Load the model and tokenizer only when transformer mode is enabled."""
+
+        if self.backend != "transformers":
+            logger.info("Using lightweight rule-based sentiment backend")
+            self._load_error = None
+            return
 
         if self._pipeline is not None:
             return
@@ -69,6 +119,12 @@ class SentimentModelManager:
                 return
 
             try:
+                from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
+
+                import torch
+
+                self.device = "cuda" if torch.cuda.is_available() else "cpu"
+                self._device_index = 0 if torch.cuda.is_available() else -1
                 logger.info("Loading model %s on %s", self.model_name, self.device)
                 tokenizer_kwargs = {}
                 model_kwargs = {}
@@ -97,8 +153,28 @@ class SentimentModelManager:
                 self._load_error = str(exc)
                 logger.exception("Failed to load sentiment model")
 
+    def _rule_based_predict(self, text: str) -> dict[str, float | str]:
+        tokens = re.findall(r"[a-zA-Z']+", text.lower())
+        if not tokens:
+            return {"label": "neutral", "confidence": 0.5}
+
+        positive_hits = sum(1 for token in tokens if token in POSITIVE_WORDS)
+        negative_hits = sum(1 for token in tokens if token in NEGATIVE_WORDS)
+
+        score = positive_hits - negative_hits
+        confidence = min(0.99, max(0.55, 0.55 + (abs(score) * 0.12)))
+
+        if score > 0:
+            return {"label": "bullish", "confidence": confidence}
+        if score < 0:
+            return {"label": "bearish", "confidence": confidence}
+        return {"label": "neutral", "confidence": 0.5}
+
     def predict(self, text: str) -> dict[str, float | str]:
         """Run inference synchronously on a background thread."""
+
+        if self.backend != "transformers":
+            return self._rule_based_predict(text)
 
         if self._pipeline is None:
             raise RuntimeError("Model is not loaded")
@@ -113,6 +189,9 @@ class SentimentModelManager:
 
     def predict_batch(self, texts: list[str]) -> list[dict[str, float | str]]:
         """Run inference for a batch of texts."""
+
+        if self.backend != "transformers":
+            return [self._rule_based_predict(text) for text in texts]
 
         if self._pipeline is None:
             raise RuntimeError("Model is not loaded")

@@ -30,6 +30,7 @@ async def lifespan(app: FastAPI):
     model_manager = SentimentModelManager(
         model_name=settings.model_name,
         hf_token=settings.hf_token,
+        backend=settings.model_backend,
     )
     app.state.model_manager = model_manager
 
