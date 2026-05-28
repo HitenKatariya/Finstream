@@ -1,5 +1,7 @@
 # FinStream: AI-Powered Financial Sentiment Intelligence
 
+![FinStream project overview](project.png)
+
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-Backend-009688?logo=fastapi&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-Frontend-000000?logo=flask&logoColor=white)
