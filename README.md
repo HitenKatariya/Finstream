@@ -20,6 +20,12 @@ FinStream is a full-stack AIML project for real-time financial news sentiment an
 ### Current model
 - Hugging Face model: [hitenvk22/FinStream-Sentiment](https://huggingface.co/hitenvk22/finstream-sentiment)
 
+### Live Links
+- Backend: [https://finstream-zypg.onrender.com](https://finstream-zypg.onrender.com)
+- Frontend: [https://frontend-xsuz.onrender.com](https://frontend-xsuz.onrender.com)
+
+Deployment is in progress. The frontend talks to the backend through the Render service connection and the configured environment variables.
+
 ### Model Evaluation Snapshot
 
 ![FinStream classification report screenshot](docs/screenshots/model_classification_metrics.png)
