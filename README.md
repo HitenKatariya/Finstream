@@ -18,7 +18,7 @@ FinStream is a full-stack AIML project for real-time financial news sentiment an
 - Visualizes predictions in an interactive, portfolio-ready UI.
 
 ### Current model
-- Hugging Face model: [hitenvk22/FinStream-Sentiment](https://huggingface.co/hitenvk22/FinStream-Sentiment)
+- Hugging Face model: [hitenvk22/FinStream-Sentiment](https://huggingface.co/hitenvk22/finstream-sentiment)
 
 ## Architecture Diagram
 
@@ -126,10 +126,11 @@ Add a short walkthrough GIF and embed it below:
 
 - Model family: Transformer-based sequence classification.
 - Finetuned checkpoint: `hitenvk22/FinStream-Sentiment`.
+- Hugging Face model page: [https://huggingface.co/hitenvk22/finstream-sentiment](https://huggingface.co/hitenvk22/finstream-sentiment)
 - Label space in app layer: `bullish`, `neutral`, `bearish`.
 - Inference framework: `transformers.pipeline("sentiment-analysis")`.
 
-For deeper training metadata, refer to the model card on Hugging Face.
+For deeper training metadata, refer to the model card on [Hugging Face](https://huggingface.co/hitenvk22/finstream-sentiment).
 
 ## Hugging Face Integration
 
