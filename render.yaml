@@ -10,7 +10,7 @@ services:
       - key: MODEL_NAME
         value: hitenvk22/FinStream-Sentiment
       - key: MODEL_BACKEND
-        value: rule_based
+        value: transformers
       - key: LOG_LEVEL
         value: INFO
       - key: CORS_ORIGINS
@@ -29,6 +29,8 @@ services:
       - key: APP_NAME
         value: FinStream
       - key: BACKEND_API_URL
+        value: https://hitenvk22-finstream-api.hf.space
+      - key: BACKEND_FALLBACK_URL
         fromService:
           name: finstream-backend
           type: web

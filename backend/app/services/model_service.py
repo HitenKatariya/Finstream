@@ -9,51 +9,104 @@ from threading import Lock
 from anyio import to_thread
 
 
+torch = None
+try:
+    import torch as _torch
+    torch = _torch
+except ImportError:
+    pass
+
 logger = logging.getLogger("finstream.model")
 
 POSITIVE_WORDS = {
-    "beat",
-    "beats",
-    "beats",
+    "beat", "beats",
     "bullish",
-    "gain",
-    "gains",
+    "climb", "climbs", "climbed",
+    "gain", "gains", "gained",
     "growth",
     "higher",
-    "improve",
-    "improved",
-    "outperform",
-    "profit",
-    "profits",
-    "rally",
-    "rallies",
-    "rose",
-    "surge",
-    "surges",
-    "strong",
-    "up",
+    "improve", "improves", "improved", "improvement", "improvements",
+    "outperform", "outperforms", "outperformed",
+    "profit", "profits", "profitable", "profitability",
+    "rally", "rallies", "rallied",
+    "rise", "rises", "rose", "risen",
+    "surge", "surges", "surged",
+    "strong", "stronger", "strongly",
+    "up", "uptick", "upside",
+    "positive",
+    "record",
+    "boost", "boosts", "boosted",
+    "upgrade", "upgrades", "upgraded",
+    "exceed", "exceeds", "exceeded",
+    "expand", "expands", "expanded", "expansion",
+    "accelerate", "accelerates", "accelerated",
+    "recover", "recovers", "recovered", "recovery",
+    "rebound", "rebounds", "rebounded",
+    "jump", "jumps", "jumped",
+    "soar", "soars", "soared",
+    "elevate", "elevates", "elevated",
+    "dividend", "dividends",
+    "buyback", "buybacks",
+    "upward", "uptrend",
+    "bull",
+    "upswing",
+    "breakout",
+    "optimistic", "optimism",
+    "momentum",
+    "award", "awards", "awarded",
+    "upbeat",
+    "win", "wins", "won",
+    "success", "successful",
 }
 
 NEGATIVE_WORDS = {
     "bearish",
-    "decline",
-    "declines",
-    "drop",
-    "drops",
-    "fall",
-    "falls",
-    "loss",
-    "losses",
-    "miss",
-    "misses",
-    "pressure",
-    "risk",
-    "selloff",
-    "slump",
-    "soft",
-    "weak",
-    "weaker",
-    "down",
+    "decline", "declines", "declined",
+    "drop", "drops", "dropped",
+    "fall", "falls", "fell", "fallen",
+    "loss", "losses", "lost",
+    "miss", "misses", "missed",
+    "pressure", "pressures", "pressured",
+    "risk", "risks", "risky",
+    "selloff", "selloffs",
+    "slump", "slumps", "slumped",
+    "soft", "softer", "softness",
+    "weak", "weaker", "weakness", "weaknesses", "weaken", "weakens", "weakened",
+    "down", "downturn", "downturns", "downside", "downgrade",
+    "negative",
+    "cut", "cuts", "cutting",
+    "lower", "lowers", "lowered",
+    "reduce", "reduces", "reduced", "reduction",
+    "layoff", "layoffs",
+    "bankrupt", "bankruptcy",
+    "debt",
+    "default", "defaults",
+    "delay", "delays", "delayed",
+    "suspend", "suspends", "suspended", "suspension",
+    "worst", "worse", "worsen", "worsens", "worsened",
+    "volatile", "volatility",
+    "uncertainty", "uncertain",
+    "struggle", "struggles", "struggled",
+    "plunge", "plunges", "plunged",
+    "tumble", "tumbles", "tumbled",
+    "slide", "slides", "slid",
+    "crash", "crashes", "crashed",
+    "unemployment",
+    "recession",
+    "inflation", "inflationary",
+    "penalty", "penalties",
+    "fine", "fines",
+    "lawsuit", "lawsuits",
+    "restructuring",
+    "impairment",
+    "writeoff", "writeoffs", "write-down", "write-downs",
+    "provision", "provisions",
+    "deficit",
+    "overhang",
+    "overcapacity",
+    "downtrend",
+    "bear",
+    "underperform", "underperforms", "underperformed",
 }
 
 
@@ -80,7 +133,7 @@ def _normalize_label(raw_label: str) -> str:
 class SentimentModelManager:
     """Owns model lifecycle and performs thread-safe inference."""
 
-    def __init__(self, model_name: str, hf_token: str | None = None, backend: str = "rule_based") -> None:
+    def __init__(self, model_name: str, hf_token: str | None = None, backend: str = "transformers") -> None:
         self.model_name = model_name
         self.hf_token = hf_token
         self.backend = backend.lower().strip()
@@ -123,10 +176,8 @@ class SentimentModelManager:
             try:
                 from transformers import AutoModelForSequenceClassification, AutoTokenizer, pipeline
 
-                import torch
-
-                self.device = "cuda" if torch.cuda.is_available() else "cpu"
-                self._device_index = 0 if torch.cuda.is_available() else -1
+                self.device = "cuda" if (torch is not None and torch.cuda.is_available()) else "cpu"
+                self._device_index = 0 if (torch is not None and torch.cuda.is_available()) else -1
                 logger.info("Loading model %s on %s", self.model_name, self.device)
                 tokenizer_kwargs = {}
                 model_kwargs = {}
@@ -138,16 +189,19 @@ class SentimentModelManager:
                     self.model_name,
                     **tokenizer_kwargs,
                 )
+                model_kwargs["low_cpu_mem_usage"] = True
                 model = AutoModelForSequenceClassification.from_pretrained(
                     self.model_name,
                     **model_kwargs,
                 )
+                model.eval()
                 self._pipeline = pipeline(
                     task="sentiment-analysis",
                     model=model,
                     tokenizer=tokenizer,
                     device=self._device_index,
                     truncation=True,
+                    framework="pt",
                 )
                 self._load_error = None
                 logger.info("Model loaded successfully")
@@ -155,22 +209,60 @@ class SentimentModelManager:
                 self._load_error = str(exc)
                 logger.exception("Failed to load sentiment model")
 
+    @staticmethod
+    def _stem(token: str) -> str:
+        if len(token) <= 4:
+            return token
+        for suffix in ["ability", "abilities", "ification", "ifications",
+                        "ization", "izations", "isation", "isations",
+                        "ationally", "isation", "ization",
+                        "iveness", "fulness", "iousness",
+                        "ificantly", "isation",
+                        "ments", "ment", "ances", "ance",
+                        "eness", "ness", "ship",
+                        "able", "ably", "ible",
+                        "ally", "wise", "like",
+                        "ious", "eous", "uous",
+                        "sion", "tion", "sions", "tions",
+                        "ised", "ized", "ising", "izing",
+                        "ative", "itive", "tive",
+                        "less", "proof", "ward",
+                        "ment", "ness", "ship",
+                        "ing", "ings",
+                        "ed", "es", "er", "est", "ly"]:
+            if token.endswith(suffix) and len(token) - len(suffix) >= 3:
+                return token[:-len(suffix)]
+        return token
+
     def _rule_based_predict(self, text: str) -> dict[str, float | str]:
         tokens = re.findall(r"[a-zA-Z']+", text.lower())
         if not tokens:
             return {"label": "neutral", "confidence": 0.5}
 
-        positive_hits = sum(1 for token in tokens if token in POSITIVE_WORDS)
-        negative_hits = sum(1 for token in tokens if token in NEGATIVE_WORDS)
+        stemmed_tokens = [self._stem(t) for t in tokens]
 
+        positive_hits = sum(
+            1 for i, t in enumerate(tokens)
+            if t in POSITIVE_WORDS or stemmed_tokens[i] in POSITIVE_WORDS
+        )
+        negative_hits = sum(
+            1 for i, t in enumerate(tokens)
+            if t in NEGATIVE_WORDS or stemmed_tokens[i] in NEGATIVE_WORDS
+        )
+
+        total_hits = positive_hits + negative_hits
         score = positive_hits - negative_hits
-        confidence = min(0.99, max(0.55, 0.55 + (abs(score) * 0.12)))
+
+        if total_hits == 0:
+            return {"label": "neutral", "confidence": 0.5}
+
+        confidence = min(0.95, max(0.55, 0.55 + (abs(score) / total_hits) * 0.35))
 
         if score > 0:
-            return {"label": "bullish", "confidence": confidence}
+            return {"label": "bullish", "confidence": round(confidence, 4)}
         if score < 0:
-            return {"label": "bearish", "confidence": confidence}
-        return {"label": "neutral", "confidence": 0.5}
+            return {"label": "bearish", "confidence": round(confidence, 4)}
+        return {"label": "neutral", "confidence": round(0.5 + (positive_hits / total_hits) * 0.1, 4)}
 
     def predict(self, text: str) -> dict[str, float | str]:
         """Run inference synchronously on a background thread."""
@@ -181,7 +273,8 @@ class SentimentModelManager:
         if self._pipeline is None:
             raise RuntimeError("Model is not loaded")
 
-        output = self._pipeline(text)
+        with torch.no_grad():
+            output = self._pipeline(text)
         prediction = output[0] if isinstance(output, list) else output
 
         label = prediction.get("label", "unknown")
@@ -198,7 +291,8 @@ class SentimentModelManager:
         if self._pipeline is None:
             raise RuntimeError("Model is not loaded")
 
-        output = self._pipeline(texts)
+        with torch.no_grad():
+            output = self._pipeline(texts)
         if isinstance(output, dict):
             output = [output]
 

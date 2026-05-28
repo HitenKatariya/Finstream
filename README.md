@@ -25,6 +25,7 @@ FinStream is a full-stack AIML project for real-time financial news sentiment an
 ### Live Links
 - Backend: [https://finstream-zypg.onrender.com](https://finstream-zypg.onrender.com)
 - Frontend: [https://frontend-xsuz.onrender.com](https://frontend-xsuz.onrender.com)
+- HF Space (GPU API): [https://hitenvk22-finstream-api.hf.space](https://hitenvk22-finstream-api.hf.space)
 
 Deployment is in progress. The frontend talks to the backend through the Render service connection and the configured environment variables.
 
@@ -270,13 +271,15 @@ console.log(data);
 ## Render Deployment Guide
 
 Deploy the project with the root [render.yaml](render.yaml) blueprint.
-The backend and frontend are both containerized with Dockerfiles, and the Flask frontend proxies `/api/*` calls to the backend service over Render's internal network.
+The backend and frontend are both containerized with Dockerfiles. The Flask frontend proxies `/api/*` calls to the Hugging Face Space API (primary) with the Render backend as auto-fallback.
+
+> **Auto-deploy**: Render Blueprint watches your connected GitHub repo — every push triggers an automatic redeploy.
 
 ### What Render creates
 
-- Backend Docker service from [backend/Dockerfile](backend/Dockerfile)
+- Backend Docker service from [backend/Dockerfile](backend/Dockerfile) (fallback)
 - Frontend Docker service from [frontend/Dockerfile](frontend/Dockerfile)
-- Internal backend connection injected into the frontend through `BACKEND_API_URL`
+- Frontend proxies to `https://hitenvk22-finstream-api.hf.space` (HF Space) with Render backend as fallback
 
 ### Setup steps
 
@@ -299,5 +302,58 @@ The backend and frontend are both containerized with Dockerfiles, and the Flask 
 - The frontend browser only talks to the Flask service.
 - The Flask service forwards requests to the FastAPI backend.
 - You can later replace the backend service URL by updating `BACKEND_API_URL`.
+
+---
+
+## Hugging Face Spaces Deployment (GPU Inference)
+
+The FinStream backend is also deployed on Hugging Face Spaces with optional GPU acceleration.
+
+### Live API
+
+- **HF Space**: [hitenvk22/FinStream-API](https://huggingface.co/spaces/hitenvk22/FinStream-API)
+- **API Base URL**: `https://hitenvk22-finstream-api.hf.space`
+- **Model**: `hitenvk22/FinStream-Sentiment` (distilroberta-base, 82M params)
+- **Hardware**: CPU-basic (free) / T4 small (paid upgrade for GPU)
+
+### Architecture
+
+```
+User Browser → Render Frontend (Flask) → HF Space API (GPU) → Model Inference
+                                   ↘ Fallback → Render Backend (CPU)
+```
+
+The frontend tries the HF Space first. If it's unreachable, it auto-falls back to the Render backend.
+
+### Enabling GPU
+
+1. Go to your Space: https://huggingface.co/spaces/hitenvk22/FinStream-API/settings
+2. Under **Hardware**, select **T4 small** (requires paid HF credits)
+3. The Space restarts and inference runs on CUDA with float16 precision
+
+### API Endpoints
+
+Same as the Render backend:
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/health` | Service and model status |
+| `POST` | `/predict` | Single text sentiment analysis |
+| `POST` | `/analyze-csv` | Batch CSV sentiment analysis |
+
+### Testing the API
+
+```bash
+curl -X POST "https://hitenvk22-finstream-api.hf.space/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"text": "Company shares surge after quarterly revenue beats expectations."}'
+```
+
+Expected response:
+
+```json
+{"label": "bullish", "confidence": 0.98}
+```
+
 
 
