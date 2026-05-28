@@ -11,6 +11,7 @@ env/
 .DS_Store
 .ipynb_checkpoints/
 backend/.env
+project.txt
 backend/__pycache__/
 backend/app/**/__pycache__/
 backend/.python-version
