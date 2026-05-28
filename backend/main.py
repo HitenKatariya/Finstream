@@ -48,6 +48,29 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
+@app.get("/", tags=["root"])
+async def root_configuration():
+    """Return a lightweight API configuration summary for the service root."""
+
+    return {
+        "service": settings.app_name,
+        "version": settings.app_version,
+        "mode": settings.model_backend,
+        "status": "running",
+        "model": settings.model_name,
+        "docs": {
+            "swagger": "/docs",
+            "redoc": "/redoc",
+            "health": "/health",
+        },
+        "endpoints": {
+            "predict": "/predict",
+            "analyze_csv": "/analyze-csv",
+            "report_download": "/reports/{report_id}.pdf",
+        },
+    }
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
